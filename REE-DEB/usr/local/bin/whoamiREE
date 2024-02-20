@@ -1,0 +1,29 @@
+#!/bin/bash
+
+LOG_FILE="/var/log/REE.log"
+echo "" > /var/log/REE.log
+log() {
+    echo "$(date '+%Y-%m-%d %H:%M:%S') - $1" >> "$LOG_FILE"
+}
+
+log "Cleaning"
+sudo /usr/local/bin/cleaning.sh
+
+echo "0" > /usr/local/status
+
+sleep 3
+
+if cat /sys/class/net/eth0/carrier | grep -q "0"
+then
+    log "Start as a node"
+    sudo /usr/local/bin/isbridge.sh &
+    sudo /usr/local/bin/isgateway.sh &
+    sudo /usr/local/bin/node.sh
+fi
+
+while (true);do
+    sleep 10
+done
+
+# PING
+
